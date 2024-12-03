@@ -7,7 +7,7 @@ class AlexNet(nn.Module):
     def __init__(self):
         super(AlexNet, self).__init__()
         self.relu =nn.ReLU()
-        self.c1 = nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=0)
+        self.c1 = nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=0)
         self.s2 = nn.MaxPool2d(kernel_size=3, stride=2)
         self.c3 = nn.Conv2d(96, 256, kernel_size=5, padding=2)
         self.s4 = nn.MaxPool2d(kernel_size=3, stride=2)
@@ -16,7 +16,7 @@ class AlexNet(nn.Module):
         self.c7 = nn.Conv2d(384, 256, kernel_size=3, padding=1)
         self.s8 = nn.MaxPool2d(kernel_size=3, stride=2)
         self.flatten = nn.Flatten()
-        self.f1 = nn.Linear(256 * 6 * 6, 4096)
+        self.f1 = nn.Linear(256 * 5 * 5, 4096)
         self.f2 = nn.Linear(4096, 4096)
         self.f3 = nn.Linear(4096, 10)
 
@@ -41,8 +41,3 @@ class AlexNet(nn.Module):
         x = self.f3(x)
         return x
 
-if __name__ == '__main__':
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = AlexNet()
-    model = model.to(device)
-    print(summary(model, (1, 227, 227)))

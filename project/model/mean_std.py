@@ -1,10 +1,11 @@
 import os
-from tkinter import Image
+from PIL import Image
+
 
 import numpy as np
 
 # 文件夹路径
-folder_path = 'data_cat_dog'
+folder_path = 'cat_dog'
 
 # 初始化累积变量
 total_pixels = 0

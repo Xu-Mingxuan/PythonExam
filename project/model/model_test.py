@@ -62,7 +62,7 @@ def test_model_process(model,test_loader):
 if __name__ == '__main__':
     # 加载模型和模型参数
     model = AlexNet()
-    model.load_state_dict(torch.load('lenet.pth'))
+    model.load_state_dict(torch.load('Alexnet.pth'))
 
     # 加载数据集
     test_loader = test_data_process()
@@ -77,37 +77,41 @@ if __name__ == '__main__':
     #
     #
     #
-    classes = ["类别一","类别二"]
-    # with torch.no_grad():
-    #     for b_x,b_y in test_loader:
-    #         b_x = b_x.to(device)
-    #         b_y = b_y.to(device)
-    #
-    #         # 设置模型为验证模式
-    #         model.eval()
-    #         output = model(b_x)
-    #         x = torch.argmax(output, dim=1)
-    #         result = x.item()
-    #         print(classes[result])
-    #         label = b_y.item()
-    #         print(classes[label])
-
-    image = Image.open('20221206205202_82c64.thumb.1000_0.jpg')
-
-    normalize = transforms.Normalize([0.485, 0.456, 0.406],[0.05,0.052,0.047])
-
-    test_transform = transforms.Compose([transforms.Resize((224, 224)),
-                                          transforms.ToTensor(),
-                                          normalize])
-    image = test_transform(image)
-
-    # 添加一个批次为一的维数，符合输入条件
-    image = image.unsquence(0)
-
+    classes = ["猫","狗"]
     with torch.no_grad():
-        model.eval()
-        image = image.to(device)
-        output = model(image)
-        pre_lab = torch.argmax(output, dim=1)
-        result = pre_lab.item()
-    print('预测值为： ',classes[result])
+        # # 设置模型为验证模式
+        # model.eval()
+        #
+        # for b_x,b_y in test_loader:
+        #     b_x = b_x.to(device)
+        #     b_y = b_y.to(device)
+        #
+        #     output = model(b_x)
+        #     x = torch.argmax(output, dim=1)
+        #     for i in range(x.size(0)):
+        #         result = x[i].item()  # 获取当前样本的预测结果
+        #         print("预测类别: ", classes[result])  # 打印预测类别
+        #         label = b_y[i].item()  # 获取当前样本的实际标签
+        #         print("实际类别: ", classes[label])  # 打印实际类别
+        #     label = b_y.item()
+        #     print(classes[label])
+
+        image = Image.open('2.jpg')
+
+        normalize = transforms.Normalize([0.163,0.153,0.140],[0.058,0.053,0.048])
+
+        test_transform = transforms.Compose([transforms.Resize((224, 224)),
+                                              transforms.ToTensor(),
+                                              normalize])
+        image = test_transform(image)
+
+        # 添加一个批次为一的维数，符合输入条件
+        image = image.unsqueeze(0)
+
+        with torch.no_grad():
+            model.eval()
+            image = image.to(device)
+            output = model(image)
+            pre_lab = torch.argmax(output, dim=1)
+            result = pre_lab.item()
+        print('预测值为： ',classes[result])
