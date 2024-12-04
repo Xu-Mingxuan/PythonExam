@@ -79,22 +79,6 @@ if __name__ == '__main__':
     #
     classes = ["猫","狗"]
     with torch.no_grad():
-        # # 设置模型为验证模式
-        # model.eval()
-        #
-        # for b_x,b_y in test_loader:
-        #     b_x = b_x.to(device)
-        #     b_y = b_y.to(device)
-        #
-        #     output = model(b_x)
-        #     x = torch.argmax(output, dim=1)
-        #     for i in range(x.size(0)):
-        #         result = x[i].item()  # 获取当前样本的预测结果
-        #         print("预测类别: ", classes[result])  # 打印预测类别
-        #         label = b_y[i].item()  # 获取当前样本的实际标签
-        #         print("实际类别: ", classes[label])  # 打印实际类别
-        #     label = b_y.item()
-        #     print(classes[label])
 
         image = Image.open('2.jpg')
 

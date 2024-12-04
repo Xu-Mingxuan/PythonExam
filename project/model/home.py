@@ -1,56 +1,52 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, jsonify
 import torch
-from torchvision import transforms
+from torchvision import models, transforms
 from PIL import Image
+from flask_cors import CORS  # 解决跨域问题
 from model import AlexNet
-
+# 初始化 Flask 应用
 app = Flask(__name__)
+CORS(app)  # 启用跨域请求支持
 
 # 加载模型
 model = AlexNet()
-model.load_state_dict(torch.load('Alexnet.pth', weights_only=True))
+model.load_state_dict(torch.load('D:/测试/pythonProject/project/model/Alexnet.pth'))
 model.eval()
 
-# 类别名称
-classes = ["猫", "狗"]  # 根据你的数据集调整
+# 定义预处理步骤
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
 
-# 图像预处理
-def preprocess_image(image_path):
-    normalize = transforms.Normalize([0.485, 0.456, 0.406], [0.05, 0.052, 0.047])
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        normalize
-    ])
+# 预测路由
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'})
 
-    image = Image.open(image_path)
-    image = transform(image)
-    image = image.unsqueeze(0)  # 添加批次维度
-    return image
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'})
 
-# 预测函数
-def predict_image(image):
-    with torch.no_grad():
-        output = model(image)
-        pre_lab = torch.argmax(output, dim=1)
-        return classes[pre_lab.item()]
+    print(f"Received file: {file.filename}")  # 用于调试
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        # 获取上传的文件
-        file = request.files['file']
-        if file:
-            # 保存文件到临时位置
-            file_path = f'temp/{file.filename}'
-            file.save(file_path)
+    try:
+        img = Image.open(file.stream)
+        img = transform(img).unsqueeze(0)
+    except Exception as e:
+        return jsonify({'error': f'Error processing image: {e}'})
 
-            # 预处理并预测
-            image = preprocess_image(file_path)
-            result = predict_image(image)
-            return render_template('index.html', result=result)
+    try:
+        with torch.no_grad():
+            outputs = model(img)
+            _, predicted = torch.max(outputs, 1)
+            result = "猫" if predicted.item() == 0 else "狗"
+        return jsonify({'result': result})
+    except Exception as e:
+        return jsonify({'error': f'Error in model prediction: {e}'})
 
-    return render_template('home.html', result=None)
-
+# 启动 Flask 应用
 if __name__ == '__main__':
     app.run(debug=True)
