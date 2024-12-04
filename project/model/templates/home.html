@@ -149,15 +149,17 @@
         <div class="category" id="cats" class="active">
             <h2>猫咪种类</h2>
             <div class="images">
-                <img src="cat1.jpeg" alt="猫咪1">
-                <img src="cat2.jpeg" alt="猫咪2">
+                <img src="{{ url_for('static', filename='images/cat1.jpeg') }}" alt="猫咪1">
+                <img src="{{ url_for('static', filename='images/cat2.jpeg') }}" alt="狗狗1">
+
             </div>
         </div>
         <div class="category" id="dogs">
             <h2>狗狗种类</h2>
             <div class="images">
-                <img src="dog1.jpeg" alt="狗狗1">
-                <img src="dog2.jpeg" alt="狗狗2">
+                <img src="{{ url_for('static', filename='images/dog1.jpeg') }}" alt="猫咪1">
+                <img src="{{ url_for('static', filename='images/dog2.jpeg') }}" alt="狗狗1">
+
             </div>
         </div>
     </section>
@@ -237,10 +239,11 @@
         formData.append('file', fileInput.files[0]); // 将图片文件添加到 FormData
 
         // 发送请求到后端进行分类
-        fetch('http://localhost:5000/predict', {
+        fetch('http://127.0.0.1:5000/predict', {
             method: 'POST',
             body: formData
         })
+
         .then(response => response.json())  // 解析 JSON 格式的响应数据
         .then(data => {
             resultSection.style.display = 'block'; // 显示分类结果区域
