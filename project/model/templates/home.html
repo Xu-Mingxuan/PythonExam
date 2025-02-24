@@ -1,260 +1,67 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猫狗类别分类展示</title>
-    <style>
-        /* CSS 样式部分 */
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "layout.html" %}
 
-        /* Basic styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-        }
+{% block content %}
+<div class="intro-section">
+    <h2>欢迎使用智能猫狗分类系统</h2>
+    <p class="subtitle">基于深度学习的图像识别技术，快速准确识别您的宠物照片</p>
 
-        header {
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        h1 {
-            font-size: 2.5em;
-        }
-
-        p {
-            font-size: 1.2em;
-            margin-top: 10px;
-        }
-
-        nav {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        input[type="file"] {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1.2em;
-            margin: 0 10px;
-            cursor: pointer;
-            border: none;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #resultSection {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        #resultText {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        /* Gallery Section */
-        #gallery {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px;
-            flex-wrap: wrap;
-        }
-
-        .category {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            width: 45%;
-            margin-bottom: 20px;
-        }
-
-        .category.active {
-            display: flex;
-        }
-
-        .images {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .images img {
-            width: 100%;
-            max-width: 250px;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .images img:hover {
-            transform: scale(1.05);
-        }
-
-        /* Footer */
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            margin-top: 30px;
-        }
-
-        /* 图片预览 */
-        #imagePreview {
-            display: none;
-            margin-top: 20px;
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-    </style>
-</head>
-
-<body>
-    <header>
-        <h1>猫狗类别分类展示</h1>
-        <p>探索不同种类的猫咪和狗狗。</p>
-    </header>
-
-    <!-- 图片分类展示部分 -->
-    <nav>
-        <button id="showCats">显示猫咪</button>
-        <button id="showDogs">显示狗狗</button>
-    </nav>
-
-    <section id="gallery">
-        <div class="category" id="cats" class="active">
-            <h2>猫咪种类</h2>
-            <div class="images">
-                <img src="{{ url_for('static', filename='images/cat1.jpeg') }}" alt="猫咪1">
-                <img src="{{ url_for('static', filename='images/cat2.jpeg') }}" alt="狗狗1">
-
-            </div>
+    <div class="feature-steps">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h3>上传图片</h3>
+            <p>支持 JPG/PNG 格式的宠物照片</p>
         </div>
-        <div class="category" id="dogs">
-            <h2>狗狗种类</h2>
-            <div class="images">
-                <img src="{{ url_for('static', filename='images/dog1.jpeg') }}" alt="猫咪1">
-                <img src="{{ url_for('static', filename='images/dog2.jpeg') }}" alt="狗狗1">
-
-            </div>
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h3>智能分析</h3>
+            <p>使用先进的 AlexNet 模型进行识别</p>
         </div>
-    </section>
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h3>获取结果</h3>
+            <p>即时返回猫/狗的分类结果</p>
+        </div>
+    </div>
+</div>
 
-    <header>
-        <h1>上传图片，查看分类结果！</h1>
-    </header>
+{% if 'user_id' in session %}
+<div class="upload-section">
+    <h2>开始检测</h2>
+    <div class="upload-box">
+        <form id="upload-form" action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
+            <label for="file">选择宠物照片：</label>
+            <input type="file" name="file" id="file" accept="image/*" required>
+            <button type="submit">开始识别 →</button>
+        </form>
+    </div>
+    <div id="result" class="result-box"></div>
+</div>
+{% else %}
+<div class="auth-reminder">
+    <h2>立即体验智能识别</h2>
+    <p>请先<a href="{{ url_for('login') }}">登录</a>或<a href="{{ url_for('register') }}">注册</a>账号</p>
+</div>
+{% endif %}
 
-    <nav>
-        <!-- 图片输入框 -->
-        <input type="file" id="imageInput" accept="image/*">
-        <button id="classifyButton">开始分类</button>
-    </nav>
-
-    <img id="imagePreview" src="" alt="上传图片预览">
-
-    <!-- 分类结果区域 -->
-    <section id="resultSection">
-        <h2>分类结果:</h2>
-        <p id="resultText">正在加载...</p>
-    </section>
-
-    <footer>
-        <p>版权所有 &copy; 2024 猫狗分类展示</p>
-    </footer>
-
-    <script>
-    // 显示猫咪或狗狗图片的切换
-    document.addEventListener('DOMContentLoaded', () => {
-        const showCatsBtn = document.getElementById('showCats');
-        const showDogsBtn = document.getElementById('showDogs');
-        const catsSection = document.getElementById('cats');
-        const dogsSection = document.getElementById('dogs');
-
-        // 显示猫咪
-        showCatsBtn.addEventListener('click', () => {
-            catsSection.classList.add('active');
-            dogsSection.classList.remove('active');
-        });
-
-        // 显示狗狗
-        showDogsBtn.addEventListener('click', () => {
-            dogsSection.classList.add('active');
-            catsSection.classList.remove('active');
-        });
-    });
-
-    // 显示用户上传的图片
-    document.getElementById('imageInput').addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            const imagePreview = document.getElementById('imagePreview');
-            imagePreview.src = e.target.result; // 设置预览图片的路径
-            imagePreview.style.display = 'block'; // 显示预览图片
-        };
-
-        if (file) {
-            reader.readAsDataURL(file); // 读取文件并显示
-        }
-    });
-
-    // 点击分类按钮时进行分类
-    document.getElementById('classifyButton').addEventListener('click', function() {
-        const fileInput = document.getElementById('imageInput');
-        const resultSection = document.getElementById('resultSection');
-        const resultText = document.getElementById('resultText');
-
-        // 检查是否选择了文件
-        if (!fileInput.files.length) {
-            alert('请选择一张图片');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]); // 将图片文件添加到 FormData
-
-        // 发送请求到后端进行分类
-        fetch('http://127.0.0.1:5000/predict', {
+<script>
+    document.getElementById('upload-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/predict', {
             method: 'POST',
             body: formData
         })
-
-        .then(response => response.json())  // 解析 JSON 格式的响应数据
+        .then(response => response.json())
         .then(data => {
-            resultSection.style.display = 'block'; // 显示分类结果区域
-            resultText.textContent = `分类结果：${data.result}`; // 显示分类结果
+            if (data.error) {
+                document.getElementById('result').innerText = `错误: ${data.error}`;
+            } else {
+                document.getElementById('result').innerText = `预测结果: ${data.result}`;
+            }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('分类失败，请稍后再试'); // 异常处理
+            document.getElementById('result').innerText = `请求失败: ${error}`;
         });
     });
 </script>
-
-</body>
-</html>
+{% endblock %}

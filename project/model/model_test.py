@@ -68,7 +68,7 @@ if __name__ == '__main__':
     test_loader = test_data_process()
 
     # # 加载模型测试函数
-    # test_model_process(model,test_loader)
+    # test_model_process(cat_dog_website,test_loader)
     #
     #
     # # 验证模式

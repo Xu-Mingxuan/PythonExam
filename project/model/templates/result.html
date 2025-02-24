@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2>预测结果</h2>
+    <p>上传的图片是：<strong>{{ result }}</strong></p>
+    <a href="{{ url_for('index') }}">返回首页</a>
+{% endblock %}
